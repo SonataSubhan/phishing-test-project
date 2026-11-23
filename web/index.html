@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phishing URL Detector</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">Phishing URL Detector</a>
+    <nav class="nav">
+      <a href="index.html" class="active">Checker</a>
+      <a href="slides.html">Presentation</a>
+      <a href="https://github.com/SonataSubhan/phishing-test-project">Source code</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section>
+    <h1>Is this link phishing?</h1>
+    <p class="muted">Paste a URL. The model looks only at the domain name and estimates how likely it is to be a phishing site. The page is never opened.</p>
+  </section>
+
+  <section class="box">
+    <form class="check-form" id="form">
+      <input id="url" type="text" placeholder="https://example.com/login" autocomplete="off" spellcheck="false" disabled>
+      <button class="btn" id="check" type="submit" disabled>Loading model…</button>
+    </form>
+    <div class="examples">Try:
+      <button type="button">https://www.kapitalbank.az</button>
+      <button type="button">http://kapitalbank-az-onlayn-giris.top/login</button>
+      <button type="button">https://microsoft-365-auth-login.firebaseapp.com</button>
+      <button type="button">https://github.com</button>
+    </div>
+  </section>
+
+  <section id="output"></section>
+
+  <section class="box" id="history-box" hidden>
+    <h3>Checked so far</h3>
+    <ul class="history" id="history"></ul>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <div class="grid3">
+      <div class="box">
+        <h3>1. Domain</h3>
+        <p class="small">The scheme, <code>www.</code>, port and path are removed. Only the hostname is kept, for example <code>kapitalbank-az-onlayn-giris.top</code>.</p>
+      </div>
+      <div class="box">
+        <h3>2. Character n-grams</h3>
+        <p class="small">The hostname is split into all pieces of 2 to 5 characters (<code>ka</code>, <code>.top</code>, <code>bank-</code> …) and each piece gets a TF-IDF weight.</p>
+      </div>
+      <div class="box">
+        <h3>3. Logistic regression</h3>
+        <p class="small">A linear model trained on 219k labelled domains adds up the weights and turns the score into a probability with the sigmoid function.</p>
+      </div>
+    </div>
+    <p class="muted small" style="margin-top:12px">Test accuracy 88.0%, ROC-AUC 0.923 on 43.8k unseen domains (PhiUSIIL dataset). The model runs fully in your browser. Known limitation: phishing pages hosted on big platforms like <code>docs.google.com</code> cannot be told apart by the domain alone.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <span>Subhan Huseynov · B.01.509.22.020</span>
+    <span>Artificial Intelligence course project, 2026</span>
+  </div>
+</footer>
+
+<script src="js/model.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

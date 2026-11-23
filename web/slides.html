@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phishing URL Detection – Presentation</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/slides.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">Phishing URL Detector</a>
+    <nav class="nav">
+      <a href="index.html">Checker</a>
+      <a href="slides.html" class="active">Presentation</a>
+      <a href="https://github.com/SonataSubhan/phishing-test-project">Source code</a>
+    </nav>
+  </div>
+</header>
+
+<main class="deck">
+
+<!-- 1 -->
+<section class="slide"><div class="slide-inner title-slide">
+  <div class="label">Artificial Intelligence · Course Project</div>
+  <h1>Phishing URL Detection with Machine Learning</h1>
+  <p class="meta">Subhan Huseynov · B.01.509.22.020</p>
+  <p class="meta">Practical / implementation-based project · 2026</p>
+  <p class="muted small">Use ← → or the buttons below. Press F for fullscreen.</p>
+</div></section>
+
+<!-- 2 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Problem</div>
+  <h2>Why phishing URLs?</h2>
+  <ul>
+    <li>Phishing is one of the most common ways attackers steal passwords, card data and company accounts.</li>
+    <li>The attack almost always starts with a link: in an email, SMS or social media message.</li>
+    <li>Blacklists only know links that were already reported. New phishing domains live for hours or days, so they are often missed.</li>
+    <li>Idea: look at the link itself and decide <b>before</b> the page is opened.</li>
+  </ul>
+  <div class="cols">
+    <div class="box"><p class="small muted">Real</p><code>https://www.kapitalbank.az</code></div>
+    <div class="box"><p class="small muted">Fake (example)</p><code>http://kapitalbank-az-onlayn-giris.top/login</code></div>
+  </div>
+</div></section>
+
+<!-- 3 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Objectives</div>
+  <h2>What the project does</h2>
+  <ul>
+    <li>Build a classifier that predicts <b>phishing</b> or <b>legitimate</b> from the URL string only.</li>
+    <li>Compare three approaches: hand-made features with Logistic Regression and Random Forest, and character n-grams.</li>
+    <li>Check the dataset carefully and measure performance in a fair way.</li>
+    <li>Explain why the model makes a decision, not only the result.</li>
+    <li>Make it usable: a website that runs the model in the browser.</li>
+  </ul>
+</div></section>
+
+<!-- 4 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Connection to the course</div>
+  <h2>Where this fits in AI</h2>
+  <div class="cols">
+    <div>
+      <h3>Agent view</h3>
+      <p>The detector is a simple agent: the <b>percept</b> is a URL, the <b>action</b> is warn or allow. Its performance measure is how many phishing links it catches without blocking real sites.</p>
+      <h3>Learning from examples</h3>
+      <p>Instead of writing rules by hand, the agent learns them from 235k labelled examples. This is <b>supervised learning</b> (classification).</p>
+    </div>
+    <div>
+      <h3>Methods from the course</h3>
+      <ul>
+        <li>Logistic regression: linear classifier + sigmoid</li>
+        <li>Decision trees and ensembles (Random Forest)</li>
+        <li>Train / test split, generalization, overfitting</li>
+        <li>Evaluation: accuracy, precision, recall, F1, ROC</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 5 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Connection to the course</div>
+  <h2>Features work like heuristics</h2>
+  <div class="cols">
+    <div>
+      <p>In search (A*), a heuristic <code>h(n)</code> is a cheap estimate computed from the state, for example misplaced tiles or Manhattan distance in the 8-puzzle. We never solve the full problem to get it.</p>
+      <p>Here the idea is the same: we do not open the website (expensive, risky). We compute cheap signals from the text of the domain and estimate how "phishing-like" it is.</p>
+    </div>
+    <div>
+      <p>The analogy goes further:</p>
+      <ul>
+        <li>Manhattan distance <b>dominates</b> misplaced tiles because it carries more information.</li>
+        <li>In the same way, 200,000 character n-grams carry more information than 13 hand-made features, and they give better results (F1 0.83 vs 0.77).</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 6 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Literature review</div>
+  <h2>Related work</h2>
+  <ul>
+    <li><b>Ma et al. (2009)</b>, <i>Beyond Blacklists</i>: showed that lexical and host features of URLs are enough to detect malicious sites with high accuracy.</li>
+    <li><b>Sahingoz et al. (2019)</b>: compared 7 classifiers on URL features; Random Forest with NLP-based features gave the best result.</li>
+    <li><b>Le et al. (2018)</b>, <i>URLNet</i>: character- and word-level CNNs learn the URL representation directly, without manual features.</li>
+    <li><b>Prasad &amp; Chandra (2024)</b>, <i>PhiUSIIL</i>: the dataset used in this project, 235k URLs collected from real phishing feeds and top websites.</li>
+    <li><b>Geirhos et al. (2020)</b>, <i>Shortcut learning</i>: models often learn easy shortcuts in the data instead of the real task. This turned out to be important here.</li>
+  </ul>
+</div></section>
+
+<!-- 7 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Data</div>
+  <h2>Dataset: PhiUSIIL</h2>
+  <div class="cols">
+    <div>
+      <div class="big">235,795</div>
+      <p class="muted">URLs from the UCI Machine Learning Repository</p>
+      <table>
+        <tr><td>Legitimate</td><td class="num">134,850</td></tr>
+        <tr><td>Phishing</td><td class="num">100,945</td></tr>
+        <tr><td>Unique hostnames</td><td class="num">219,094</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Examples</h3>
+      <pre>legit     https://www.levelup.com
+legit     https://www.cinematheque.fr
+phishing  https://caseid1008934573489573489.firebaseapp.com/
+phishing  http://www.meta-doublecrypto.com/
+phishing  https://exchangeportal-owa-auth-login-aspx-hyttgygh
+          .infura-ipfs.io/ipfs/...</pre>
+    </div>
+  </div>
+</div></section>
+
+<!-- 8 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Analysis</div>
+  <h2>A problem in the data</h2>
+  <p>Before training I compared how the two classes are written:</p>
+  <div class="table-wrap"><table>
+    <tr><th></th><th class="num">Legitimate</th><th class="num">Phishing</th></tr>
+    <tr><td>Starts with <code>https://www.</code></td><td class="num">100%</td><td class="num">2.4%</td></tr>
+    <tr><td>Uses <code>https</code></td><td class="num">100%</td><td class="num">48.7%</td></tr>
+    <tr><td>Has a path after the domain</td><td class="num">0%</td><td class="num">59.9%</td></tr>
+  </table></div>
+  <p>Every legitimate URL has exactly the form <code>https://www.domain</code>. A model can reach almost 100% just by checking this format, without learning anything about phishing. In real life phishing links also use https and www, so such a model would fail. This is the <b>shortcut learning</b> problem.</p>
+</div></section>
+
+<!-- 9 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Methodology</div>
+  <h2>Two experiments</h2>
+  <div class="cols">
+    <div class="box">
+      <h3>A. Naive: full URL</h3>
+      <p>Use the URL as it is. 21 features including https, www and path length. Shows what happens if the bias is ignored.</p>
+    </div>
+    <div class="box">
+      <h3>B. Fair: hostname only</h3>
+      <p>Remove scheme, <code>www.</code>, port and path. Remove duplicate hostnames so the same domain is never in both train and test. 13 features.</p>
+    </div>
+  </div>
+  <div class="flow">
+    <span>235k URLs</span><i>→</i><span>clean to hostname</span><i>→</i><span>features / n-grams</span><i>→</i><span>80% train</span><i>→</i><span>3 models</span><i>→</i><span>20% test</span>
+  </div>
+  <p class="muted small">Stratified split, random_state = 42, so the results are reproducible.</p>
+</div></section>
+
+<!-- 10 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Methodology</div>
+  <h2>Hand-made features</h2>
+  <div class="cols">
+    <div class="table-wrap"><table>
+      <tr><th>Feature</th><th>Why</th></tr>
+      <tr><td>Length</td><td>Fake domains are often long</td></tr>
+      <tr><td>Entropy</td><td>Random-looking generated names</td></tr>
+      <tr><td>Hyphens</td><td><code>paypal-secure-login</code></td></tr>
+      <tr><td>Digits, digit ratio</td><td>Real brands rarely use many digits</td></tr>
+      <tr><td>Subdomains, dots</td><td><code>paypal.com.secure.xyz</code></td></tr>
+      <tr><td>Suspicious TLD</td><td>Cheap TLDs: .xyz, .top, .tk</td></tr>
+      <tr><td>IP address</td><td>Real sites use names</td></tr>
+      <tr><td>Suspicious words</td><td>login, verify, secure, bank …</td></tr>
+    </table></div>
+    <div>
+      <p>Same bank, two domains:</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th class="num">kapitalbank.az</th><th class="num">kapitalbank-az-onlayn-giris.top</th></tr>
+        <tr><td>Length</td><td class="num">14</td><td class="num">31</td></tr>
+        <tr><td>Hyphens</td><td class="num">0</td><td class="num">3</td></tr>
+        <tr><td>Suspicious TLD</td><td class="num">0</td><td class="num">1</td></tr>
+        <tr><td>Entropy</td><td class="num">3.09</td><td class="num">3.80</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 11 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Methodology</div>
+  <h2>Three models</h2>
+  <div class="cols">
+    <div>
+      <h3>Logistic Regression</h3>
+      <p>Each feature gets a weight. The weighted sum goes through the sigmoid and becomes a probability between 0 and 1. Simple and easy to explain, used as a baseline.</p>
+      <h3>Random Forest</h3>
+      <p>200 decision trees, each trained on a random sample. Every tree asks questions like "length &gt; 25?" and votes. Finds non-linear combinations of features.</p>
+    </div>
+    <div>
+      <h3>Character n-grams + Logistic Regression</h3>
+      <p>No manual features. The hostname is cut into every substring of 2–5 characters:</p>
+      <pre>bank-az.top → ba, an, nk, k-, -a, az, z., .t, to, op,
+              ban, ank, nk-, ..., .top, bank-, ...</pre>
+      <p>Each piece is weighted with TF-IDF (rare pieces count more). The 200,000 most common pieces are the input to logistic regression.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 12 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Results</div>
+  <h2>Results on the test set</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Experiment</th><th>Model</th><th class="num">Accuracy</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">ROC-AUC</th></tr>
+    <tr><td>A: full URL</td><td>Logistic Regression</td><td class="num">0.998</td><td class="num">1.000</td><td class="num">0.996</td><td class="num">0.998</td><td class="num">0.999</td></tr>
+    <tr><td>A: full URL</td><td>Random Forest</td><td class="num">0.998</td><td class="num">0.999</td><td class="num">0.996</td><td class="num">0.998</td><td class="num">0.998</td></tr>
+    <tr><td>A: full URL</td><td>Char n-gram + LR</td><td class="num">0.997</td><td class="num">1.000</td><td class="num">0.993</td><td class="num">0.997</td><td class="num">0.999</td></tr>
+    <tr><td>B: hostname</td><td>Logistic Regression</td><td class="num">0.837</td><td class="num">0.891</td><td class="num">0.656</td><td class="num">0.756</td><td class="num">0.840</td></tr>
+    <tr><td>B: hostname</td><td>Random Forest</td><td class="num">0.845</td><td class="num">0.892</td><td class="num">0.678</td><td class="num">0.770</td><td class="num">0.849</td></tr>
+    <tr><td><b>B: hostname</b></td><td><b>Char n-gram + LR</b></td><td class="num"><b>0.880</b></td><td class="num"><b>0.918</b></td><td class="num"><b>0.755</b></td><td class="num"><b>0.828</b></td><td class="num"><b>0.923</b></td></tr>
+  </table></div>
+  <ul>
+    <li>Precision: when the model says "phishing", how often it is right.</li>
+    <li>Recall: how many of all phishing domains it finds.</li>
+  </ul>
+</div></section>
+
+<!-- 13 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Results</div>
+  <h2>What the numbers mean</h2>
+  <p>F1 score in experiment B (hostname only):</p>
+  <div class="hbar"><span>Logistic Regression</span><div class="track"><div class="fill grey" style="width:75.6%"></div></div><span class="num">0.756</span></div>
+  <div class="hbar"><span>Random Forest</span><div class="track"><div class="fill grey" style="width:77.0%"></div></div><span class="num">0.770</span></div>
+  <div class="hbar"><span>Char n-gram + LR</span><div class="track"><div class="fill" style="width:82.8%"></div></div><span class="num">0.828</span></div>
+  <ul>
+    <li>The 99.8% in experiment A comes from the format shortcut. All three models look perfect, which is itself a warning sign.</li>
+    <li>On hostnames only, the n-gram model is clearly the best. It finds patterns like <code>-login</code>, <code>secure-</code> and brand names inside long domains.</li>
+    <li>Precision (0.92) is higher than recall (0.75): the model is careful, but it misses about one in four phishing domains. The next slides show why.</li>
+  </ul>
+</div></section>
+
+<!-- 14 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Results</div>
+  <h2>Which features matter</h2>
+  <div class="cols">
+    <img src="img/importance_B_fair_hostname.png" alt="Feature importance, experiment B">
+    <img src="img/importance_A_naive_full_url.png" alt="Feature importance, experiment A">
+  </div>
+  <p>Left (fair): entropy, length, suspicious TLD and digit ratio are the strongest signals. Right (naive): the model relies on https, path length and <code>www</code>, which proves the shortcut.</p>
+</div></section>
+
+<!-- 15 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Results</div>
+  <h2>Confusion matrices</h2>
+  <div class="cols">
+    <img src="img/confusion_B_fair_hostname.png" alt="Confusion matrix, experiment B">
+    <img src="img/confusion_A_naive_full_url.png" alt="Confusion matrix, experiment A">
+  </div>
+  <p>Rows are the real labels, columns the predictions. In experiment B the main error is the bottom-left cell: phishing domains predicted as legitimate.</p>
+</div></section>
+
+<!-- 16 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Analysis</div>
+  <h2>Limitation: phishing on trusted platforms</h2>
+  <div class="cols">
+    <div>
+      <p>The demo marks <code>google.com</code> as phishing. I checked the data:</p>
+      <div class="table-wrap"><table>
+        <tr><th>Google host</th><th class="num">Phishing rows</th></tr>
+        <tr><td>docs.google.com</td><td class="num">526</td></tr>
+        <tr><td>sites.google.com</td><td class="num">180</td></tr>
+        <tr><td>storage.cloud.google.com</td><td class="num">51</td></tr>
+        <tr><td>google.com</td><td class="num">10</td></tr>
+        <tr><td><b>All Google hosts</b></td><td class="num"><b>922</b> (legit: 12)</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <p>Attackers host fake login forms on Google Forms, Firebase and IPFS. The domain is real, only the path is malicious. A model that sees only the hostname cannot separate them.</p>
+      <p><b>Possible fixes:</b></p>
+      <ul>
+        <li>Allowlist of popular domains (e.g. Tranco top 10k)</li>
+        <li>Look at the path for known hosting platforms</li>
+        <li>Analyse page content: forms, logos, links</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 17 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Implementation</div>
+  <h2>System architecture</h2>
+  <div class="flow">
+    <span>train.py (Python)</span><i>→</i><span>model.joblib</span><i>→</i><span>export_model.py</span><i>→</i><span>model.json (4.8 MB)</span><i>→</i><span>model.js in the browser</span>
+  </div>
+  <ul>
+    <li>Training and experiments: Python, pandas, scikit-learn, matplotlib.</li>
+    <li>The final n-gram model is exported to JSON: for every n-gram its IDF value and its weight.</li>
+    <li>The website repeats the same math in JavaScript: n-grams → TF-IDF → L2 normalisation → weighted sum → sigmoid. I checked that it gives the same probabilities as Python.</li>
+    <li>No server is needed. The site is static and deployed on Vercel. The URL never leaves the user's browser.</li>
+  </ul>
+</div></section>
+
+<!-- 18 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Source code</div>
+  <h2>Project structure</h2>
+  <div class="cols">
+    <pre>src/
+  features.py      feature extraction
+  train.py         experiments A and B
+  predict.py       command line demo
+  export_model.py  model to JSON
+web/
+  index.html       checker page
+  slides.html      this presentation
+  js/model.js      model in JavaScript
+  js/app.js        page logic
+  model.json       exported model
+results/           metrics and plots</pre>
+    <div>
+      <h3>features.py</h3>
+      <pre><code>def hostname_of(url):
+    if "://" not in url:
+        url = "http://" + url
+    host = (urlsplit(url).hostname or "").lower()
+    return host[4:] if host.startswith("www.") else host</code></pre>
+      <p class="small">Every experiment B input goes through this function, which removes the shortcut.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 19 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Source code</div>
+  <h2>Training and prediction</h2>
+  <div class="cols">
+    <div>
+      <h3>train.py: n-gram model</h3>
+      <pre><code>ngram = make_pipeline(
+    TfidfVectorizer(analyzer="char",
+                    ngram_range=(2, 5),
+                    min_df=3, sublinear_tf=True,
+                    max_features=200_000),
+    LogisticRegression(max_iter=2000, C=4))
+ngram.fit(train_hosts, y_train)</code></pre>
+    </div>
+    <div>
+      <h3>model.js: same model in the browser</h3>
+      <pre><code>for (const [g, count] of charNgrams(host, 2, 5)) {
+  const [idf, weight] = model.vocab[g];
+  value = (1 + Math.log(count)) * idf;
+  ...
+}
+score += (value / norm) * weight;
+probability = 1 / (1 + Math.exp(-score));</code></pre>
+      <p class="small">The biggest positive and negative terms are shown on the checker page as an explanation.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 20 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Demo</div>
+  <h2>Live demo</h2>
+  <p>Open the <a href="index.html">checker page</a> and try:</p>
+  <div class="table-wrap"><table>
+    <tr><th>URL</th><th>Result</th></tr>
+    <tr><td><code>https://www.kapitalbank.az</code></td><td class="green">legitimate, 17%</td></tr>
+    <tr><td><code>http://kapitalbank-az-onlayn-giris.top/login</code></td><td class="red">phishing, 96%</td></tr>
+    <tr><td><code>https://microsoft-365-auth-login.firebaseapp.com</code></td><td class="red">phishing, 100%</td></tr>
+    <tr><td><code>https://www.google.com</code></td><td class="red">phishing, 72% (known limitation)</td></tr>
+  </table></div>
+  <p>For the fake bank domain, <code>.top</code> and <code>bank-</code> push the score up, while <code>lbank</code> and <code>bank</code> pull it down.</p>
+</div></section>
+
+<!-- 21 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">Conclusion</div>
+  <h2>Conclusion and future work</h2>
+  <ul>
+    <li>A URL-only model can detect most phishing domains: 88% accuracy and 0.92 ROC-AUC on unseen domains, without opening the page.</li>
+    <li>Character n-grams beat hand-made features, the same way a more informed heuristic beats a weaker one.</li>
+    <li>The most important lesson: <b>check the data first</b>. The naive 99.8% was a shortcut, not real performance.</li>
+    <li>Domain-only models cannot handle phishing hosted on trusted platforms.</li>
+  </ul>
+  <h3>Future work</h3>
+  <ul>
+    <li>Combine with a domain allowlist and path features for hosting platforms.</li>
+    <li>Test on a second dataset collected at a different time.</li>
+    <li>Try a small character-level neural network (like URLNet).</li>
+  </ul>
+</div></section>
+
+<!-- 22 -->
+<section class="slide"><div class="slide-inner">
+  <div class="label">References</div>
+  <h2>References</h2>
+  <ul class="small">
+    <li>Ma, J., Saul, L. K., Savage, S., &amp; Voelker, G. M. (2009). Beyond blacklists: Learning to detect malicious web sites from suspicious URLs. <i>Proc. ACM SIGKDD</i>, 1245–1254.</li>
+    <li>Sahingoz, O. K., Buber, E., Demir, O., &amp; Diri, B. (2019). Machine learning based phishing detection from URLs. <i>Expert Systems with Applications</i>, 117, 345–357.</li>
+    <li>Le, H., Pham, Q., Sahoo, D., &amp; Hoi, S. C. H. (2018). URLNet: Learning a URL representation with deep learning for malicious URL detection. <i>arXiv:1802.03162</i>.</li>
+    <li>Prasad, A., &amp; Chandra, S. (2024). PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning. <i>Computers &amp; Security</i>, 136, 103545.</li>
+    <li>Geirhos, R., et al. (2020). Shortcut learning in deep neural networks. <i>Nature Machine Intelligence</i>, 2, 665–673.</li>
+    <li>Russell, S., &amp; Norvig, P. (2021). <i>Artificial Intelligence: A Modern Approach</i> (4th ed.). Pearson.</li>
+    <li>Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. <i>JMLR</i>, 12, 2825–2830.</li>
+  </ul>
+  <p style="margin-top:20px">Thank you. Questions?</p>
+  <p class="muted">Subhan Huseynov · B.01.509.22.020</p>
+</div></section>
+
+</main>
+
+<div class="progress"><span id="progress"></span></div>
+<nav class="controls">
+  <div class="controls-inner">
+    <button id="prev" type="button">← Previous</button>
+    <span id="counter">1 / 22</span>
+    <button id="next" type="button">Next →</button>
+  </div>
+</nav>
+
+<script src="js/slides.js"></script>
+</body>
+</html>
