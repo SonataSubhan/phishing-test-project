@@ -1,0 +1,56 @@
+[
+  {
+    "model": "Logistic Regression",
+    "accuracy": 0.9981,
+    "precision": 1.0,
+    "recall": 0.9956,
+    "f1": 0.9978,
+    "roc_auc": 0.9986,
+    "experiment": "A_naive_full_url"
+  },
+  {
+    "model": "Random Forest",
+    "accuracy": 0.998,
+    "precision": 0.9992,
+    "recall": 0.996,
+    "f1": 0.9976,
+    "roc_auc": 0.9985,
+    "experiment": "A_naive_full_url"
+  },
+  {
+    "model": "Char n-gram + LR",
+    "accuracy": 0.9971,
+    "precision": 0.9999,
+    "recall": 0.9934,
+    "f1": 0.9966,
+    "roc_auc": 0.999,
+    "experiment": "A_naive_full_url"
+  },
+  {
+    "model": "Logistic Regression",
+    "accuracy": 0.8368,
+    "precision": 0.8907,
+    "recall": 0.6563,
+    "f1": 0.7557,
+    "roc_auc": 0.8401,
+    "experiment": "B_fair_hostname"
+  },
+  {
+    "model": "Random Forest",
+    "accuracy": 0.8445,
+    "precision": 0.8921,
+    "recall": 0.6777,
+    "f1": 0.7702,
+    "roc_auc": 0.8494,
+    "experiment": "B_fair_hostname"
+  },
+  {
+    "model": "Char n-gram + LR",
+    "accuracy": 0.8797,
+    "precision": 0.9181,
+    "recall": 0.7545,
+    "f1": 0.8283,
+    "roc_auc": 0.9232,
+    "experiment": "B_fair_hostname"
+  }
+]
